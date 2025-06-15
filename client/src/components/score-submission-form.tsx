@@ -1,0 +1,278 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
+import { Camera, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { calculateRating, formatRating, getRatingColor, playRetroSound } from "@/lib/utils";
+
+const sessionSchema = z.object({
+  playerName: z.string().min(1, "Player name is required").max(100),
+  venueId: z.number().min(1, "Please select a venue"),
+  state: z.string().min(1, "Please select a state"),
+  scores: z.array(z.number().min(0).max(1000)).length(5),
+  notes: z.string().max(500).optional(),
+});
+
+type SessionForm = z.infer<typeof sessionSchema>;
+
+export default function ScoreSubmissionForm() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+
+  const form = useForm<SessionForm>({
+    resolver: zodResolver(sessionSchema),
+    defaultValues: {
+      playerName: "",
+      venueId: 0,
+      state: "",
+      scores: [0, 0, 0, 0, 0],
+      notes: "",
+    },
+  });
+
+  const { data: venues = [] } = useQuery({
+    queryKey: ["/api/venues", selectedState],
+    enabled: !!selectedState && selectedState !== "OTHER",
+  });
+
+  const createSessionMutation = useMutation({
+    mutationFn: async (data: SessionForm) => {
+      const response = await apiRequest("POST", "/api/sessions", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "🎯 SESSION SUBMITTED!",
+        description: "Your scores have been recorded. Keep rolling!",
+      });
+      playRetroSound("success");
+      form.reset();
+      setPhotoFile(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/leaderboard"] });
+    },
+    onError: () => {
+      toast({
+        title: "❌ SUBMISSION FAILED",
+        description: "Please check your scores and try again.",
+        variant: "destructive",
+      });
+      playRetroSound("error");
+    },
+  });
+
+  const scores = form.watch("scores");
+  const currentRating = calculateRating(scores);
+
+  const onSubmit = (data: SessionForm) => {
+    if (!photoFile) {
+      toast({
+        title: "📷 PHOTO REQUIRED",
+        description: "Please upload a verification photo of your scores.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (data.state === "OTHER") {
+      toast({
+        title: "🚧 COMING SOON",
+        description: "New states coming soon! Apply to be a Skeecaptain to help expand.",
+      });
+      return;
+    }
+
+    createSessionMutation.mutate(data);
+  };
+
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      playRetroSound("submit");
+    }
+  };
+
+  return (
+    <section className="bg-slate-800/50 border-2 border-cyan-400 rounded-lg p-6 max-w-md mx-auto">
+      <h3 className="text-center text-cyan-400 mb-6 neon-text">SUBMIT SESSION</h3>
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="playerName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs text-gray-300">PLAYER NAME</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    className="retro-input font-mono text-sm"
+                    placeholder="ENTER NAME"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="state"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs text-gray-300">STATE</FormLabel>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    setSelectedState(value);
+                    form.setValue("venueId", 0);
+                  }}
+                >
+                  <FormControl>
+                    <SelectTrigger className="retro-input font-mono text-sm">
+                      <SelectValue placeholder="SELECT STATE" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="OR">OREGON</SelectItem>
+                    <SelectItem value="WA">WASHINGTON</SelectItem>
+                    <SelectItem value="CA">CALIFORNIA</SelectItem>
+                    <SelectItem value="OTHER">OTHER</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {selectedState && selectedState !== "OTHER" && (
+            <FormField
+              control={form.control}
+              name="venueId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs text-gray-300">VENUE</FormLabel>
+                  <Select
+                    value={field.value.toString()}
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="retro-input font-mono text-sm">
+                        <SelectValue placeholder="SELECT VENUE" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {venues.map((venue: any) => (
+                        <SelectItem key={venue.id} value={venue.id.toString()}>
+                          {venue.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
+          <div>
+            <FormLabel className="text-xs text-gray-300 mb-2 block">5 GAME SCORES</FormLabel>
+            <div className="grid grid-cols-5 gap-2">
+              {[0, 1, 2, 3, 4].map((index) => (
+                <FormField
+                  key={index}
+                  control={form.control}
+                  name={`scores.${index}`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          min="0"
+                          max="1000"
+                          className="retro-input text-center font-mono text-sm"
+                          placeholder="0"
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-slate-900/80 border border-yellow-400 p-3 rounded text-center">
+            <div className="text-xs text-gray-300 mb-1">CALCULATED RATING</div>
+            <div className={`text-2xl neon-text ${getRatingColor(currentRating)}`}>
+              {formatRating(currentRating)}
+            </div>
+            <div className="text-xs text-gray-400 mt-1">AVG OF MIDDLE 3 SCORES</div>
+          </div>
+
+          <div>
+            <FormLabel className="text-xs text-gray-300 mb-2 block">VERIFICATION PHOTO</FormLabel>
+            <div className="border-2 border-dashed border-cyan-400 rounded-lg p-4 text-center">
+              <Camera className="text-cyan-400 text-2xl mb-2 mx-auto" />
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                id="photo-upload"
+                onChange={handlePhotoUpload}
+              />
+              <label
+                htmlFor="photo-upload"
+                className="text-xs text-cyan-400 hover:text-white transition-colors cursor-pointer"
+              >
+                {photoFile ? "PHOTO SELECTED ✓" : "TAP TO CAPTURE SCORES"}
+              </label>
+              <div className="text-xs text-gray-400 mt-1">REQUIRED FOR VERIFICATION</div>
+            </div>
+          </div>
+
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs text-gray-300">NOTES (OPTIONAL)</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    className="retro-input font-mono text-sm h-20 resize-none"
+                    placeholder="MACHINE NOTES, TOURNAMENT INFO, ETC..."
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type="submit"
+            className="retro-button w-full py-4 font-mono text-sm rounded hover:animate-glow"
+            disabled={createSessionMutation.isPending}
+          >
+            <Upload className="mr-2" size={16} />
+            {createSessionMutation.isPending ? "SUBMITTING..." : "SUBMIT SESSION"}
+          </Button>
+        </form>
+      </Form>
+    </section>
+  );
+}

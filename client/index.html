@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Skeeboard - The Ranking System for Alleyrollers</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Skeeboard is the ultimate skeeball ranking system for alleyrollers. Submit your 5-game sessions, climb leaderboards, and become the skeeball champion!" />
+    <meta name="keywords" content="skeeball, arcade games, leaderboard, ranking, alleyroller, skee ball" />
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Skeeboard - The Ranking System for Alleyrollers" />
+    <meta property="og:description" content="Submit your skeeball sessions and climb the ultimate alleyroller leaderboards!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://skeeboard.com" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0A0E27">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Skeeboard">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+    
+    <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <script type="text/javascript" src="https://replit.com/public/js/replit-dev-banner.js"></script>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "Skeeboard - The Ranking System for Alleyrollers",
+  "short_name": "Skeeboard",
+  "description": "Submit your skeeball sessions and climb the ultimate alleyroller leaderboards!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0E27",
+  "theme_color": "#0A0E27",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjMEEwRTI3Ii8+CjxjaXJjbGUgY3g9Ijk2IiBjeT0iOTYiIHI9IjQ4IiBmaWxsPSIjRkY2QjM1Ii8+CjxjaXJjbGUgY3g9Ijk2IiBjeT0iOTYiIHI9IjMyIiBmaWxsPSIjMDBGNUZGIi8+CjxjaXJjbGUgY3g9Ijk2IiBjeT0iOTYiIHI9IjE2IiBmaWxsPSIjRkZENzAwIi8+Cjx0ZXh0IHg9Ijk2IiB5PSIxNjAiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMwMEY1RkYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlNLRUVCT0FSRDwvdGV4dD4KPC9zdmc+",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSIjMEEwRTI3Ii8+CjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMTI4IiBmaWxsPSIjRkY2QjM1Ii8+CjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iODUiIGZpbGw9IiMwMEY1RkYiLz4KPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSI0MiIgZmlsbD0iI0ZGRDcwMCIvPgo8dGV4dCB4PSIyNTYiIHk9IjQyMCIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIzNiIgZmlsbD0iIzAwRjVGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U0tFRUJPQVJEPC90ZXh0Pgo8L3N2Zz4=",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["games", "sports", "entertainment"],
+  "lang": "en-US",
+  "dir": "ltr"
+}

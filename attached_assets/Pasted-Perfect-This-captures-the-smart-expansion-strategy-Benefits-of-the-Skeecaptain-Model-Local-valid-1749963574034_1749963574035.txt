@@ -1,0 +1,168 @@
+Perfect! This captures the smart expansion strategy:
+Benefits of the Skeecaptain Model:
+
+Local validation - Someone who knows the venues can spot BS scores
+Community building - Creates local ownership and investment
+Scalable growth - You don't have to research every city's arcade scene
+Quality control - Skeecaptains verify venues actually have skeeball
+Local knowledge - They know which machines are broken, tournaments, etc.
+
+How it could work:
+
+Start with Portland/Seattle/SF where you can manage directly
+When someone from Austin or Chicago finds the site, they can apply to be Skeecaptain
+Skeecaptains get special privileges:
+
+Add/verify venues in their city
+Flag suspicious scores for review
+Maybe get a special badge or title
+Could even get small perks from local venues
+
+
+
+Application process for Skeecaptains:
+
+Must live in the city
+Submit list of venues with skeeball in their area
+Maybe vouch for initial scores from a few players
+Commit to checking in weekly/monthly
+
+This creates a natural expansion path that's sustainable and community-driven. Much better than trying to map every arcade in America yourself!RetryRBi need some direct instructions to feed to my llm to scaffold this out.EditHere are direct instructions to scaffold out Skeeboard:
+Project: Skeeboard - Skeeball Leaderboard Web App
+Core Requirements
+
+Responsive web app (mobile-first, works on phones at arcades)
+No user authentication initially (just name entry)
+Simple form-based score submission
+City-based expansion with Skeecaptain moderation system
+Photo upload for verification (photos not permanently stored)
+
+Tech Stack Recommendation
+
+Frontend: React or vanilla HTML/CSS/JS (keep it simple)
+Backend: Node.js + Express
+Database: PostgreSQL or SQLite to start
+Hosting: Vercel/Netlify for frontend, Railway/Render for backend
+Photo handling: Temporary storage only (24-48 hour cleanup)
+
+Database Schema
+sql-- Cities table
+CREATE TABLE cities (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  state VARCHAR(10),
+  skeecaptain_email VARCHAR(255),
+  active BOOLEAN DEFAULT true
+);
+
+-- Venues table  
+CREATE TABLE venues (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(200) NOT NULL,
+  city_id INTEGER REFERENCES cities(id),
+  address TEXT,
+  verified BOOLEAN DEFAULT false,
+  active BOOLEAN DEFAULT true
+);
+
+-- Sessions table (each 5-game submission)
+CREATE TABLE sessions (
+  id SERIAL PRIMARY KEY,
+  player_name VARCHAR(100) NOT NULL,
+  venue_id INTEGER REFERENCES venues(id),
+  score_1 INTEGER NOT NULL,
+  score_2 INTEGER NOT NULL, 
+  score_3 INTEGER NOT NULL,
+  score_4 INTEGER NOT NULL,
+  score_5 INTEGER NOT NULL,
+  calculated_rating INTEGER NOT NULL,
+  photo_verified BOOLEAN DEFAULT false,
+  notes TEXT,
+  submitted_at TIMESTAMP DEFAULT NOW(),
+  approved BOOLEAN DEFAULT true
+);
+Key Features to Build
+
+Score Submission Form
+
+City dropdown (Portland, Seattle, SF, Other)
+Venue dropdown (populated based on city)
+Player name input
+5 score inputs with real-time rating calculation
+Photo upload (required)
+Notes field (optional)
+
+
+Rating Calculation Logic
+javascriptfunction calculateRating(scores) {
+  const sorted = [...scores].sort((a, b) => b - a);
+  const middleThree = sorted.slice(1, 4);
+  return Math.round(middleThree.reduce((sum, score) => sum + score, 0) / 3);
+}
+
+Leaderboards
+
+Global rankings (average rating across all venues)
+City-specific rankings
+Venue champions (best rating at each venue)
+Player profiles showing session history
+
+
+Skeecaptain Application System
+
+Simple form for new cities
+Email notification system
+Admin panel for approving new cities/skeecaptains
+
+
+
+API Endpoints Needed
+GET /api/cities - List active cities
+GET /api/venues/:cityId - Get venues for city
+POST /api/sessions - Submit new session
+GET /api/leaderboard/:type/:filter - Get rankings
+GET /api/player/:name - Get player stats
+POST /api/skeecaptain/apply - Apply to be skeecaptain
+Photo Handling Strategy
+
+Accept photo upload during submission
+Store temporarily (24-48 hours max)
+Flag session as "photo_verified: true"
+Automated cleanup job to delete old photos
+Keep metadata (timestamp, file existed) but not actual image
+
+Moderation Features
+
+Flag sessions with suspicious scores (all 900+, perfect scores, etc.)
+Skeecaptain dashboard to review flagged sessions
+Simple approve/reject system
+Email notifications to skeecaptains for reviews
+
+Launch Strategy
+
+Phase 1: Portland only, manual venue entry
+Phase 2: Add Seattle and SF
+Phase 3: Open skeecaptain applications
+Phase 4: Scale to major cities
+
+Frontend Pages Needed
+
+Home/Submit session page
+Global leaderboard
+City leaderboards
+Venue pages
+Player profile pages
+Skeecaptain application page
+About/how it works page
+
+Deployment Checklist
+
+Domain: skeeboard.com
+SSL certificate
+Mobile-responsive design
+Photo upload functionality
+Email system for skeecaptain notifications
+Basic analytics (Google Analytics)
+Simple admin panel for managing cities/venues
+
+Build this as an MVP first - get the core score submission and leaderboards working, then add the skeecaptain system once you have users in the initial cities.

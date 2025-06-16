@@ -4,13 +4,28 @@ import { storage } from "./storage";
 import { insertSessionSchema, insertSkeecaptainApplicationSchema, insertVenueSchema } from "@shared/schema";
 import { z } from "zod";
 
-function calculateRating(scores: number[]): number {
-  const validScores = scores.filter(score => score > 0);
-  if (validScores.length < 3) return 0;
-  
-  const sorted = [...validScores].sort((a, b) => b - a);
-  const middleThree = sorted.slice(1, 4);
-  return Math.round(middleThree.reduce((sum, score) => sum + score, 0) / 3);
+// ARM Rating System Functions
+function expectedScoreForRating(armRating: number): number {
+  return (armRating - 7) * 25 + 150;
+}
+
+function calculateARMUpdate(currentRating: number, sessionTotal: number, K: number = 0.15): number {
+  const expected = expectedScoreForRating(currentRating);
+  const delta = (sessionTotal - expected) / 100;
+  return Math.round((currentRating + K * delta) * 10) / 10; // Round to 1 decimal place
+}
+
+function getInitialARMRating(sessionTotals: number[]): number {
+  const avgScore = sessionTotals.reduce((sum, score) => sum + score, 0) / sessionTotals.length;
+  const baseRating = 7 + ((avgScore - 150) / 25);
+  return Math.max(7.0, Math.min(25.0, Math.round(baseRating * 10) / 10));
+}
+
+function getKFactor(totalSessions: number): number {
+  if (totalSessions < 10) return 0.20;
+  if (totalSessions < 25) return 0.15;
+  if (totalSessions < 50) return 0.10;
+  return 0.08;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {

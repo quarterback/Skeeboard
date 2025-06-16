@@ -24,10 +24,10 @@ export function expectedScoreForRating(armRating: number): number {
   return (armRating - 7) * 25 + 150;
 }
 
-export function calculateARMUpdate(currentRating: number, sessionTotal: number, K: number = 0.15): number {
+export function calculateARMUpdate(currentRating: number, sessionScore: number, K: number = 0.15): number {
   const expected = expectedScoreForRating(currentRating);
-  const delta = (sessionTotal - expected) / 100;
-  return Math.round((currentRating + K * delta) * 10) / 10; // Round to 1 decimal place
+  const delta = (sessionScore - expected) / 100;
+  return Math.round((currentRating + K * delta) * 10) / 10;
 }
 
 export function getInitialARMRating(firstThreeSessions: number[]): number {

@@ -1,8 +1,8 @@
 import { 
-  cities, venues, sessions, skeecaptainApplications,
-  type City, type Venue, type Session, type SkeecaptainApplication,
-  type InsertCity, type InsertVenue, type InsertSession, type InsertSkeecaptainApplication,
-  type LeaderboardEntry, type PlayerStats
+  players, sessions,
+  type Player, type Session,
+  type InsertPlayer, type InsertSession,
+  type PlayerProfile
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, sql, and, or } from "drizzle-orm";

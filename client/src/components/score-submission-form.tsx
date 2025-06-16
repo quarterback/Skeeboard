@@ -164,17 +164,16 @@ export default function ScoreSubmissionForm() {
                             placeholder="0"
                             value={field.value || ""}
                             onChange={(e) => {
-                              const value = e.target.value.replace(/[^0-9]/g, '');
+                              let value = e.target.value.replace(/[^0-9]/g, '');
                               if (value === '') {
                                 field.onChange(0);
                                 return;
                               }
-                              const numValue = parseInt(value);
-                              // Validate: must be 0-900 in increments of 10
-                              if (numValue <= 900 && numValue % 10 === 0) {
-                                field.onChange(numValue);
-                              }
-                              // If invalid, don't update the field value
+                              let numValue = parseInt(value);
+                              
+                              // Round to nearest 10 and cap at 900
+                              numValue = Math.min(Math.round(numValue / 10) * 10, 900);
+                              field.onChange(numValue);
                             }}
                           />
                         </FormControl>

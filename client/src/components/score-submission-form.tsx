@@ -15,8 +15,7 @@ import { calculateRating, formatRating, getRatingColor, playRetroSound } from "@
 
 const sessionSchema = z.object({
   playerName: z.string().min(1, "Player name is required").max(100),
-  venueId: z.number().min(1, "Please select a venue"),
-  state: z.string().min(1, "Please select a state"),
+  venueName: z.string().min(1, "Venue name is required").max(200),
   scores: z.array(z.number().min(0).max(1000)).length(5),
   notes: z.string().max(500).optional(),
 });

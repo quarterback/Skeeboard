@@ -56,12 +56,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertSessionSchema.parse(req.body);
       const { scores, ...sessionData } = validatedData;
       
-      const calculatedRating = calculateRating(scores);
+      const sessionTotal = scores.reduce((sum: number, score: number) => sum + score, 0);
       
       // Check for suspicious scores (all perfect, all the same, etc.)
-      const allPerfect = scores.every(score => score >= 900);
-      const allSame = scores.every(score => score === scores[0]);
+      const allPerfect = scores.every((score: number) => score >= 900);
+      const allSame = scores.every((score: number) => score === scores[0]);
       const suspicious = allPerfect || allSame;
+      
+      // Get player's existing sessions to calculate ARM rating
+      const existingSessions = await storage.getSessionsByPlayer(sessionData.playerName);
+      const totalSessions = existingSessions.length;
+      
+      let armRating: number | null = null;
+      let armDelta: number | null = null;
+      
+      if (totalSessions === 0) {
+        // First session - start provisional
+        armRating = 10.0; // Start at middle rating
+      } else if (totalSessions >= 2) {
+        // Calculate ARM rating after 3+ sessions
+        if (totalSessions === 2) {
+          // Third session - calculate initial rating from first 3 sessions
+          const firstThree = [
+            ...existingSessions.slice(0, 2).map(s => s.sessionTotal),
+            sessionTotal
+          ];
+          armRating = getInitialARMRating(firstThree);
+          armDelta = armRating - 10.0; // Delta from initial provisional
+        } else {
+          // Update existing rating
+          const currentRating = existingSessions[0].armRating || 10.0;
+          const kFactor = getKFactor(totalSessions);
+          armRating = calculateARMUpdate(currentRating, sessionTotal, kFactor);
+          armDelta = armRating - currentRating;
+        }
+      }
       
       const session = await storage.createSession({
         ...sessionData,
@@ -70,7 +99,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         score3: scores[2],
         score4: scores[3],
         score5: scores[4],
-        calculatedRating,
+        sessionTotal,
+        armRating,
+        armDelta,
         approved: !suspicious, // Auto-approve unless suspicious
       });
       
@@ -79,6 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: "Invalid session data", errors: error.errors });
       } else {
+        console.error("Session creation error:", error);
         res.status(500).json({ message: "Failed to create session" });
       }
     }
@@ -108,11 +140,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get venue leaderboard
-  app.get("/api/leaderboard/venue/:venueId", async (req, res) => {
+  app.get("/api/leaderboard/venue/:venueName", async (req, res) => {
     try {
-      const venueId = parseInt(req.params.venueId);
+      const { venueName } = req.params;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
-      const leaderboard = await storage.getVenueLeaderboard(venueId, limit);
+      const leaderboard = await storage.getVenueLeaderboard(decodeURIComponent(venueName), limit);
       res.json(leaderboard);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch venue leaderboard" });

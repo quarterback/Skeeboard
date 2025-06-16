@@ -78,6 +78,7 @@ export const insertSessionSchema = createInsertSchema(sessions).omit({
   submittedAt: true,
   armRating: true,
   armDelta: true,
+  sessionTotal: true,
 }).extend({
   scores: z.array(z.number().min(0).max(1000)).length(5),
 });
@@ -104,7 +105,7 @@ export type InsertSkeecaptainApplication = z.infer<typeof insertSkeecaptainAppli
 // Additional types for API responses
 export type LeaderboardEntry = {
   playerName: string;
-  rating: number;
+  rating: number; // ARM rating
   sessions: number;
   venueName: string;
   cityName: string;
@@ -115,7 +116,7 @@ export type LeaderboardEntry = {
 export type PlayerStats = {
   playerName: string;
   totalSessions: number;
-  bestRating: number;
-  averageRating: number;
+  bestRating: number; // Best ARM rating
+  averageRating: number; // Average ARM rating
   venuesPlayed: number;
 };

@@ -16,53 +16,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid session data", details: result.error.issues });
       }
 
-      const { scores, ...sessionData } = result.data;
+      const { scores, currentARMRating, ...sessionData } = result.data;
       const sessionTotal = scores.reduce((sum, score) => sum + score, 0);
+
+      // Use provided ARM rating or default
+      let armRatingBefore = currentARMRating || 10.0;
+      
+      // Calculate new ARM rating using your exact formula
+      const armRatingAfter = calculateARMUpdate(armRatingBefore, sessionTotal, 0.15);
+      const armDelta = armRatingAfter - armRatingBefore;
 
       // Get or create player
       let player = await storage.getPlayer(sessionData.playerName);
       if (!player) {
         player = await storage.createPlayer({
           name: sessionData.playerName,
-          currentRating: 10.0,
-          totalSessions: 0,
-          isProvisional: true,
-        });
-      }
-
-      // Calculate ARM rating updates
-      let armRatingBefore = player.currentRating;
-      let armRatingAfter = player.currentRating;
-      let armDelta = 0;
-
-      if (player.totalSessions >= 3 && player.isProvisional) {
-        // Calculate initial rating from first 3 sessions
-        const playerSessions = await storage.getSessionsByPlayer(player.name);
-        const firstThreeTotals = playerSessions.slice(-2).map(s => s.sessionTotal).concat([sessionTotal]);
-        const avgScore = firstThreeTotals.reduce((sum, total) => sum + total, 0) / 3;
-        armRatingAfter = Math.max(7.0, Math.min(25.0, 7 + ((avgScore - 150) / 25)));
-        armDelta = armRatingAfter - armRatingBefore;
-        
-        // Update player to non-provisional
-        await storage.updatePlayer(player.name, {
           currentRating: armRatingAfter,
-          totalSessions: player.totalSessions + 1,
+          totalSessions: 1,
           isProvisional: false,
         });
-      } else if (!player.isProvisional) {
-        // Update rating using ARM formula
-        const kFactor = getKFactor(player.totalSessions);
-        armRatingAfter = calculateARMUpdate(player.currentRating, sessionTotal, kFactor);
-        armDelta = armRatingAfter - armRatingBefore;
-        
-        // Update player rating
+      } else {
+        // Update player with new rating
         await storage.updatePlayer(player.name, {
           currentRating: armRatingAfter,
-          totalSessions: player.totalSessions + 1,
-        });
-      } else {
-        // Provisional player, just increment session count
-        await storage.updatePlayer(player.name, {
           totalSessions: player.totalSessions + 1,
         });
       }
@@ -75,9 +51,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         score3: scores[2],
         score4: scores[3],
         score5: scores[4],
-        armRatingBefore,
-        armRatingAfter,
-        armDelta,
       });
 
       res.json({ 

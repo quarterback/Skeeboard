@@ -16,6 +16,7 @@ import { calculateSessionTotal, formatRating, getRatingColor, playRetroSound } f
 const sessionSchema = z.object({
   playerName: z.string().min(1, "Player name is required").max(100),
   venueName: z.string().min(1, "Venue name is required").max(200),
+  currentARMRating: z.number().min(7.0).max(25.0).optional(),
   scores: z.array(
     z.number()
       .min(0, "Score must be at least 0")
@@ -143,6 +144,39 @@ export default function ScoreSubmissionForm() {
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="currentARMRating"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs text-gray-300">CURRENT ARM RATING (OPTIONAL)</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="tel"
+                    inputMode="decimal"
+                    className="retro-input font-mono text-sm"
+                    placeholder="10.0"
+                    value={field.value || ""}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9.]/g, '');
+                      if (value === '') {
+                        field.onChange(undefined);
+                        return;
+                      }
+                      const numValue = parseFloat(value);
+                      if (!isNaN(numValue) && numValue >= 7.0 && numValue <= 25.0) {
+                        field.onChange(numValue);
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+                <div className="text-xs text-gray-400 mt-1">ENTER IF YOU ALREADY HAVE AN ARM RATING (7.0-25.0)</div>
+              </FormItem>
+            )}
+          />
+
           <div>
             <FormLabel className="text-xs text-gray-300 mb-3 block">5 GAME SCORES</FormLabel>
             <div className="grid grid-cols-5 gap-3">
@@ -171,9 +205,16 @@ export default function ScoreSubmissionForm() {
                               }
                               let numValue = parseInt(value);
                               
+                              // Allow any input during typing, validate on blur
+                              if (numValue <= 900) {
+                                field.onChange(numValue);
+                              }
+                            }}
+                            onBlur={(e) => {
+                              let value = parseInt(e.target.value) || 0;
                               // Round to nearest 10 and cap at 900
-                              numValue = Math.min(Math.round(numValue / 10) * 10, 900);
-                              field.onChange(numValue);
+                              value = Math.min(Math.round(value / 10) * 10, 900);
+                              field.onChange(value);
                             }}
                           />
                         </FormControl>
@@ -186,12 +227,12 @@ export default function ScoreSubmissionForm() {
             <div className="text-xs text-gray-400 mt-2 text-center">ENTER SCORES 0-900 IN INCREMENTS OF 10</div>
           </div>
 
-          <div className="bg-slate-900/80 border border-yellow-400 p-3 rounded text-center">
-            <div className="text-xs text-gray-300 mb-1">SESSION TOTAL</div>
-            <div className={`text-2xl neon-text ${getRatingColor(sessionTotal)}`}>
-              {formatRating(sessionTotal)}
+          <div className="bg-slate-900/80 border border-cyan-400 p-3 rounded text-center">
+            <div className="text-xs text-gray-300 mb-1">YOUR ARM RATING WILL BE CALCULATED</div>
+            <div className="text-lg text-cyan-400 font-mono">
+              AFTER SUBMISSION
             </div>
-            <div className="text-xs text-gray-400 mt-1">SUM OF ALL 5 GAMES</div>
+            <div className="text-xs text-gray-400 mt-1">BASED ON YOUR GAME SCORES</div>
           </div>
 
           <div>

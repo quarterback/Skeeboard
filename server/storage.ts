@@ -14,7 +14,7 @@ export interface IStorage {
   updatePlayer(playerName: string, updates: Partial<Player>): Promise<Player>;
   
   // Sessions
-  createSession(session: Omit<InsertSession, 'scores'>): Promise<Session>;
+  createSession(session: Omit<InsertSession, 'scores' | 'currentARMRating'>): Promise<Session>;
   getSessionsByPlayer(playerName: string): Promise<Session[]>;
   
   // Player profiles with ARM ratings
@@ -41,7 +41,7 @@ export class DatabaseStorage implements IStorage {
     return updatedPlayer;
   }
 
-  async createSession(session: Omit<InsertSession, 'scores'>): Promise<Session> {
+  async createSession(session: Omit<InsertSession, 'scores' | 'currentARMRating'>): Promise<Session> {
     const sessionData = {
       ...session,
       sessionTotal: session.score1 + session.score2 + session.score3 + session.score4 + session.score5

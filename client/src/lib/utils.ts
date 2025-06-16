@@ -5,24 +5,39 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// ARM Rating System Utils
+export function calculateSessionTotal(scores: number[]): number {
+  return scores.reduce((sum, score) => sum + score, 0);
+}
+
+export function expectedScoreForRating(armRating: number): number {
+  return (armRating - 7) * 25 + 150;
+}
+
+export function formatARMRating(rating: number): string {
+  return rating.toFixed(1);
+}
+
+export function getARMRatingColor(rating: number): string {
+  if (rating >= 20.0) return 'text-purple-400'; // Elite
+  if (rating >= 17.0) return 'text-yellow-400'; // Master
+  if (rating >= 14.0) return 'text-orange-400'; // Expert
+  if (rating >= 11.0) return 'text-green-400'; // Advanced
+  if (rating >= 9.0) return 'text-cyan-400'; // Intermediate
+  return 'text-gray-300'; // Beginner
+}
+
+// Legacy function for backwards compatibility
 export function calculateRating(scores: number[]): number {
-  const validScores = scores.filter(score => score > 0);
-  if (validScores.length < 3) return 0;
-  
-  const sorted = [...validScores].sort((a, b) => b - a);
-  const middleThree = sorted.slice(1, 4);
-  return Math.round(middleThree.reduce((sum, score) => sum + score, 0) / 3);
+  return calculateSessionTotal(scores);
 }
 
 export function formatRating(rating: number): string {
-  return rating.toString().padStart(3, '0');
+  return rating.toString();
 }
 
 export function getRatingColor(rating: number): string {
-  if (rating >= 800) return 'text-yellow-400'; // Gold
-  if (rating >= 600) return 'text-green-400'; // Neon green
-  if (rating >= 400) return 'text-cyan-400'; // Neon cyan
-  return 'text-white';
+  return getARMRatingColor(rating / 100); // Convert session total to approximate ARM range
 }
 
 export function getRankColor(rank: number): string {

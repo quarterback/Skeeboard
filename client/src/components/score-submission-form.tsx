@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { calculateRating, formatRating, getRatingColor, playRetroSound } from "@/lib/utils";
+import { calculateSessionTotal, formatRating, getRatingColor, playRetroSound } from "@/lib/utils";
 
 const sessionSchema = z.object({
   playerName: z.string().min(1, "Player name is required").max(100),
@@ -32,8 +32,7 @@ export default function ScoreSubmissionForm() {
     resolver: zodResolver(sessionSchema),
     defaultValues: {
       playerName: "",
-      venueId: 0,
-      state: "",
+      venueName: "",
       scores: [0, 0, 0, 0, 0],
       notes: "",
     },
@@ -70,7 +69,7 @@ export default function ScoreSubmissionForm() {
   });
 
   const scores = form.watch("scores");
-  const currentRating = calculateRating(scores);
+  const sessionTotal = calculateSessionTotal(scores);
 
   const onSubmit = (data: SessionForm) => {
     if (!photoFile) {
@@ -82,14 +81,9 @@ export default function ScoreSubmissionForm() {
       return;
     }
 
-    if (data.state === "OTHER") {
-      toast({
-        title: "🚧 COMING SOON",
-        description: "New states coming soon! Apply to be a Skeecaptain to help expand.",
-      });
-      return;
-    }
-
+    // Store player name for future sessions
+    localStorage.setItem("lastPlayerName", data.playerName);
+    
     createSessionMutation.mutate(data);
   };
 
@@ -127,64 +121,22 @@ export default function ScoreSubmissionForm() {
 
           <FormField
             control={form.control}
-            name="state"
+            name="venueName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs text-gray-300">STATE</FormLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    setSelectedState(value);
-                    form.setValue("venueId", 0);
-                  }}
-                >
-                  <FormControl>
-                    <SelectTrigger className="retro-input font-mono text-sm">
-                      <SelectValue placeholder="SELECT STATE" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="OR">OREGON</SelectItem>
-                    <SelectItem value="WA">WASHINGTON</SelectItem>
-                    <SelectItem value="CA">CALIFORNIA</SelectItem>
-                    <SelectItem value="OTHER">OTHER</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormLabel className="text-xs text-gray-300">VENUE NAME</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    className="retro-input font-mono text-sm"
+                    placeholder="ENTER VENUE NAME"
+                  />
+                </FormControl>
                 <FormMessage />
+                <div className="text-xs text-gray-400 mt-1">ENTER THE ARCADE OR BAR NAME</div>
               </FormItem>
             )}
           />
-
-          {selectedState && selectedState !== "OTHER" && (
-            <FormField
-              control={form.control}
-              name="venueId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs text-gray-300">VENUE</FormLabel>
-                  <Select
-                    value={field.value.toString()}
-                    onValueChange={(value) => field.onChange(parseInt(value))}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="retro-input font-mono text-sm">
-                        <SelectValue placeholder="SELECT VENUE" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {venues.map((venue: any) => (
-                        <SelectItem key={venue.id} value={venue.id.toString()}>
-                          {venue.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
 
           <div>
             <FormLabel className="text-xs text-gray-300 mb-2 block">5 GAME SCORES</FormLabel>
@@ -215,11 +167,11 @@ export default function ScoreSubmissionForm() {
           </div>
 
           <div className="bg-slate-900/80 border border-yellow-400 p-3 rounded text-center">
-            <div className="text-xs text-gray-300 mb-1">CALCULATED RATING</div>
-            <div className={`text-2xl neon-text ${getRatingColor(currentRating)}`}>
-              {formatRating(currentRating)}
+            <div className="text-xs text-gray-300 mb-1">SESSION TOTAL</div>
+            <div className={`text-2xl neon-text ${getRatingColor(sessionTotal)}`}>
+              {formatRating(sessionTotal)}
             </div>
-            <div className="text-xs text-gray-400 mt-1">AVG OF MIDDLE 3 SCORES</div>
+            <div className="text-xs text-gray-400 mt-1">SUM OF ALL 5 GAMES</div>
           </div>
 
           <div>

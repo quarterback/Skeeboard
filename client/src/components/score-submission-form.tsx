@@ -139,31 +139,39 @@ export default function ScoreSubmissionForm() {
           />
 
           <div>
-            <FormLabel className="text-xs text-gray-300 mb-2 block">5 GAME SCORES</FormLabel>
-            <div className="grid grid-cols-5 gap-2">
+            <FormLabel className="text-xs text-gray-300 mb-3 block">5 GAME SCORES</FormLabel>
+            <div className="grid grid-cols-5 gap-3">
               {[0, 1, 2, 3, 4].map((index) => (
-                <FormField
-                  key={index}
-                  control={form.control}
-                  name={`scores.${index}`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="number"
-                          min="0"
-                          max="1000"
-                          className="retro-input text-center font-mono text-sm"
-                          placeholder="0"
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                <div key={index} className="flex flex-col items-center">
+                  <div className="text-xs text-cyan-400 mb-1 font-mono">G{index + 1}</div>
+                  <FormField
+                    control={form.control}
+                    name={`scores.${index}`}
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="tel"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            className="retro-input text-center font-mono text-sm h-12 w-full focus:ring-2 focus:ring-cyan-400"
+                            placeholder="0"
+                            value={field.value || ""}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9]/g, '');
+                              const numValue = value ? Math.min(parseInt(value), 1000) : 0;
+                              field.onChange(numValue);
+                            }}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
               ))}
             </div>
+            <div className="text-xs text-gray-400 mt-2 text-center">TAP TO ENTER EACH GAME SCORE (0-1000)</div>
           </div>
 
           <div className="bg-slate-900/80 border border-yellow-400 p-3 rounded text-center">

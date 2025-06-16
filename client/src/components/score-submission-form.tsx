@@ -16,7 +16,12 @@ import { calculateSessionTotal, formatRating, getRatingColor, playRetroSound } f
 const sessionSchema = z.object({
   playerName: z.string().min(1, "Player name is required").max(100),
   venueName: z.string().min(1, "Venue name is required").max(200),
-  scores: z.array(z.number().min(0).max(1000)).length(5),
+  scores: z.array(
+    z.number()
+      .min(0, "Score must be at least 0")
+      .max(900, "Score cannot exceed 900")
+      .refine((val) => val % 10 === 0, "Score must be in increments of 10")
+  ).length(5),
   notes: z.string().max(500).optional(),
 });
 
@@ -160,8 +165,16 @@ export default function ScoreSubmissionForm() {
                             value={field.value || ""}
                             onChange={(e) => {
                               const value = e.target.value.replace(/[^0-9]/g, '');
-                              const numValue = value ? Math.min(parseInt(value), 1000) : 0;
-                              field.onChange(numValue);
+                              if (value === '') {
+                                field.onChange(0);
+                                return;
+                              }
+                              const numValue = parseInt(value);
+                              // Validate: must be 0-900 in increments of 10
+                              if (numValue <= 900 && numValue % 10 === 0) {
+                                field.onChange(numValue);
+                              }
+                              // If invalid, don't update the field value
                             }}
                           />
                         </FormControl>
@@ -171,7 +184,7 @@ export default function ScoreSubmissionForm() {
                 </div>
               ))}
             </div>
-            <div className="text-xs text-gray-400 mt-2 text-center">TAP TO ENTER EACH GAME SCORE (0-1000)</div>
+            <div className="text-xs text-gray-400 mt-2 text-center">ENTER SCORES 0-900 IN INCREMENTS OF 10</div>
           </div>
 
           <div className="bg-slate-900/80 border border-yellow-400 p-3 rounded text-center">

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { Camera, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +16,7 @@ import { calculateSessionTotal, formatRating, getRatingColor, playRetroSound } f
 const sessionSchema = z.object({
   playerName: z.string().min(1, "Player name is required").max(100),
   venueName: z.string().min(1, "Venue name is required").max(200),
+  cityName: z.string().min(1, "City is required").max(100),
   currentARMRating: z.number().min(7.0).max(25.0).optional(),
   scores: z.array(
     z.number()
@@ -32,7 +33,7 @@ export default function ScoreSubmissionForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedState, setSelectedState] = useState<string>("");
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+
 
   const form = useForm<SessionForm>({
     resolver: zodResolver(sessionSchema),
@@ -78,15 +79,6 @@ export default function ScoreSubmissionForm() {
   const sessionTotal = calculateSessionTotal(scores);
 
   const onSubmit = (data: SessionForm) => {
-    if (!photoFile) {
-      toast({
-        title: "📷 PHOTO REQUIRED",
-        description: "Please upload a verification photo of your scores.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Store player name for future sessions
     localStorage.setItem("lastPlayerName", data.playerName);
     
@@ -140,6 +132,25 @@ export default function ScoreSubmissionForm() {
                 </FormControl>
                 <FormMessage />
                 <div className="text-xs text-gray-400 mt-1">ENTER THE ARCADE OR BAR NAME</div>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="cityName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs text-gray-300">CITY</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    className="retro-input font-mono text-sm"
+                    placeholder="ENTER CITY NAME"
+                  />
+                </FormControl>
+                <FormMessage />
+                <div className="text-xs text-gray-400 mt-1">WHICH CITY IS THIS VENUE LOCATED IN</div>
               </FormItem>
             )}
           />
@@ -235,27 +246,7 @@ export default function ScoreSubmissionForm() {
             <div className="text-xs text-gray-400 mt-1">BASED ON YOUR GAME SCORES</div>
           </div>
 
-          <div>
-            <FormLabel className="text-xs text-gray-300 mb-2 block">VERIFICATION PHOTO</FormLabel>
-            <div className="border-2 border-dashed border-cyan-400 rounded-lg p-4 text-center">
-              <Camera className="text-cyan-400 text-2xl mb-2 mx-auto" />
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                id="photo-upload"
-                onChange={handlePhotoUpload}
-              />
-              <label
-                htmlFor="photo-upload"
-                className="text-xs text-cyan-400 hover:text-white transition-colors cursor-pointer"
-              >
-                {photoFile ? "PHOTO SELECTED ✓" : "TAP TO CAPTURE SCORES"}
-              </label>
-              <div className="text-xs text-gray-400 mt-1">REQUIRED FOR VERIFICATION</div>
-            </div>
-          </div>
+
 
           <FormField
             control={form.control}

@@ -43,6 +43,11 @@ export const insertSessionSchema = createInsertSchema(sessions).omit({
   armRatingBefore: true,
   armRatingAfter: true,
   armDelta: true,
+  score1: true,
+  score2: true,
+  score3: true,
+  score4: true,
+  score5: true,
 }).extend({
   currentARMRating: z.number().min(7.0).max(25.0).optional(),
   scores: z.array(

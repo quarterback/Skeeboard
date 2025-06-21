@@ -1,0 +1,71 @@
+# 🎳 Alley Roller Metric (ARM) — Rating Calculation Instructions (UTR-style)
+
+# OVERVIEW:
+# This system calculates a player's skill rating for a skee-inspired sport.
+# Each player logs 5-game sessions (9 rolls per game). Scores are in 10-point
+# increments with a maximum session score of 900.
+
+# The ARM rating ranges from 7.0 (beginner) to 25.0 (elite), with decimal precision.
+# It increases if a player scores better than expected and decreases if they underperform.
+# Volatility (how much a rating changes) decreases as players accumulate more sessions.
+
+# RULES:
+# - Rating range: 7.0 to 25.0
+# - Score range: 0 to 900 (in 10-point increments)
+# - Rating is capped at 25.0 (max) and floored at 7.0 (min)
+# - Rating changes are scaled by "confidence" based on session count
+# - A player scoring below 150 should stay at 7.0
+# - A player scoring above 700 should cap near 25.0
+
+# ------------------------
+# 🧮 FUNCTION DEFINITIONS
+# ------------------------
+
+def expected_score_for_rating(arm_rating):
+    """
+    Maps an ARM rating (7.0–25.0) to an expected 5-game session score (150–700).
+    """
+    return ((arm_rating - 7.0) / 18.0) * 550 + 150
+
+def confidence_scale(session_count):
+    """
+    Returns a volatility multiplier based on the number of sessions played.
+    More sessions = more confidence = lower rating swing.
+    
+    Returns a value between 1.0 (low confidence) and 0.1 (high confidence).
+    """
+    return max(0.1, 1.0 / (1 + 0.1 * session_count))
+
+def calculate_arm_rating(current_rating, session_score, session_count):
+    """
+    Calculates the new ARM rating after a session.
+    Includes expected score benchmarking, bidirectional updates,
+    and volatility scaling based on session count.
+    """
+    expected = expected_score_for_rating(current_rating)
+    performance_delta = (session_score - expected) / 100
+
+    # Scale gain/loss by session-based confidence
+    volatility = confidence_scale(session_count)
+    rating_change = performance_delta * volatility
+
+    # Apply and clamp new rating
+    new_rating = current_rating + rating_change
+    return round(min(max(new_rating, 7.0), 25.0), 1)
+
+# ------------------------
+# 🧪 EXAMPLE TEST CASES
+# ------------------------
+
+# These test examples show rating increases or decreases based on performance
+
+print(calculate_arm_rating(16.0, 480, 5))    # Expect increase
+print(calculate_arm_rating(22.0, 410, 15))   # Expect decrease
+print(calculate_arm_rating(7.0, 80, 0))      # Should stay 7.0
+print(calculate_arm_rating(24.7, 720, 20))   # Should cap at 25.0
+
+# ------------------------
+# 🏷️ OPTIONAL: Provisional Flag
+# ------------------------
+# If session_count < 5, consider showing the rating with a 'p' flag (e.g., 14.2p)
+# to indicate it's still provisional and may change quickly.

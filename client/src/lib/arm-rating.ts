@@ -21,13 +21,31 @@ export interface SessionData {
 }
 
 export function expectedScoreForRating(armRating: number): number {
-  return (armRating - 7) * 25 + 150;
+  // Maps an ARM rating (7.0–25.0) to an expected 5-game session score (150–700)
+  return ((armRating - 7.0) / 18.0) * 550 + 150;
 }
 
-export function calculateARMUpdate(currentRating: number, sessionScore: number, K: number = 0.15): number {
+export function confidenceScale(sessionCount: number): number {
+  // Returns a volatility multiplier based on the number of sessions played
+  // More sessions = more confidence = lower rating swing
+  // Returns a value between 1.0 (low confidence) and 0.1 (high confidence)
+  return Math.max(0.1, 1.0 / (1 + 0.1 * sessionCount));
+}
+
+export function calculateARMUpdate(currentRating: number, sessionScore: number, sessionCount: number = 0): number {
+  // Calculates the new ARM rating after a session
+  // Includes expected score benchmarking, bidirectional updates,
+  // and volatility scaling based on session count
   const expected = expectedScoreForRating(currentRating);
-  const delta = (sessionScore - expected) / 100;
-  return Math.round((currentRating + K * delta) * 10) / 10;
+  const performanceDelta = (sessionScore - expected) / 100;
+
+  // Scale gain/loss by session-based confidence
+  const volatility = confidenceScale(sessionCount);
+  const ratingChange = performanceDelta * volatility;
+
+  // Apply and clamp new rating
+  const newRating = currentRating + ratingChange;
+  return Math.round(Math.min(Math.max(newRating, 7.0), 25.0) * 10) / 10;
 }
 
 export function getInitialARMRating(firstThreeSessions: number[]): number {

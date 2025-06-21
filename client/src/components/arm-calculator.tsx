@@ -13,6 +13,7 @@ import { playRetroSound } from "@/lib/utils";
 
 const calculatorSchema = z.object({
   currentARMRating: z.number().min(7.0).max(25.0).optional(),
+  sessionCount: z.number().min(0).max(1000).optional(),
   scores: z.array(
     z.number()
       .min(0, "Score must be at least 0")
@@ -30,6 +31,7 @@ export default function ARMCalculator() {
     resolver: zodResolver(calculatorSchema),
     defaultValues: {
       currentARMRating: undefined,
+      sessionCount: undefined,
       scores: [0, 0, 0, 0, 0],
     },
   });
@@ -40,11 +42,14 @@ export default function ARMCalculator() {
       return response.json();
     },
     onSuccess: (data) => {
-      const { armRating, armDelta } = data;
+      const { armRating, armDelta, sessionCount } = data;
       const deltaStr = armDelta > 0 ? `+${armDelta.toFixed(1)}` : armDelta.toFixed(1);
+      const isProvisional = (sessionCount || 0) < 5;
+      const ratingDisplay = isProvisional ? `${armRating.toFixed(1)}p` : armRating.toFixed(1);
+      
       toast({
         title: "ARM RATING CALCULATED",
-        description: `New rating: ${armRating.toFixed(1)} (${deltaStr})`,
+        description: `New rating: ${ratingDisplay} (${deltaStr})${isProvisional ? ' - Provisional' : ''}`,
       });
       playRetroSound("success");
     },
@@ -103,6 +108,30 @@ export default function ARMCalculator() {
                     {...field}
                     value={field.value || ""}
                     onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Session Count */}
+          <FormField
+            control={form.control}
+            name="sessionCount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-cyan-400 text-xs">TOTAL SESSIONS PLAYED</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="1000"
+                    placeholder="Enter total sessions (0 for new player)"
+                    className="retro-input"
+                    {...field}
+                    value={field.value || ""}
+                    onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                   />
                 </FormControl>
                 <FormMessage />

@@ -12,6 +12,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const calculatorSchema = z.object({
         currentARMRating: z.number().min(7.0).max(25.0).optional(),
+        sessionCount: z.number().min(0).max(1000).optional(),
         scores: z.array(z.number().min(0).max(900)).length(5),
       });
 
@@ -20,20 +21,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid data", details: result.error.issues });
       }
 
-      const { scores, currentARMRating } = result.data;
+      const { scores, currentARMRating, sessionCount } = result.data;
       const sessionTotal = scores.reduce((sum: number, score: number) => sum + score, 0);
 
       // Use provided ARM rating or default to 7.0 for new players
       const armRatingBefore = currentARMRating || 7.0;
+      // Use provided session count or default to 0 for new players
+      const totalSessions = sessionCount || 0;
       
-      // Calculate new ARM rating using your exact formula
-      const armRatingAfter = calculateARMUpdate(armRatingBefore, sessionTotal, 0.15);
+      // Calculate new ARM rating using the improved confidence-based system
+      const armRatingAfter = calculateARMUpdate(armRatingBefore, sessionTotal, totalSessions);
       const armDelta = armRatingAfter - armRatingBefore;
 
       res.json({ 
         armRating: armRatingAfter,
         armDelta,
-        sessionTotal
+        sessionTotal,
+        sessionCount: totalSessions
       });
     } catch (error) {
       console.error("Error calculating ARM rating:", error);

@@ -23,8 +23,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { scores, currentARMRating } = result.data;
       const sessionTotal = scores.reduce((sum: number, score: number) => sum + score, 0);
 
-      // Use provided ARM rating or default
-      const armRatingBefore = currentARMRating || 10.0;
+      // Use provided ARM rating or default to 7.0 for new players
+      const armRatingBefore = currentARMRating || 7.0;
       
       // Calculate new ARM rating using your exact formula
       const armRatingAfter = calculateARMUpdate(armRatingBefore, sessionTotal, 0.15);

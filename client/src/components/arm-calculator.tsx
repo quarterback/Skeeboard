@@ -94,7 +94,7 @@ export default function ARMCalculator() {
                     step="0.1"
                     min="7.0"
                     max="25.0"
-                    placeholder="10.0 (default for new players)"
+                    placeholder="Enter current rating (7.0 starting point)"
                     className="retro-input"
                     {...field}
                     value={field.value || ""}

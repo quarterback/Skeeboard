@@ -9,7 +9,7 @@ export default function Home() {
         <h2 className="text-2xl mb-4 neon-text text-orange-500">ARM RATING CALCULATOR</h2>
         <h3 className="text-lg mb-2 text-cyan-400">FOR ALLEYROLLERS</h3>
         <p className="text-xs text-gray-300 max-w-md mx-auto leading-relaxed">
-          Calculate your ARM (Alley Roller Metric) rating based on your 5-game skeeball sessions. No scores are stored - this is purely a rating calculator!
+          Rate yourself against the best alley rollers in the world
         </p>
       </section>
 

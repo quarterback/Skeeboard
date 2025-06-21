@@ -24,8 +24,9 @@ export default function SimpleForm() {
 
   const handleScoreChange = (index: number, value: string) => {
     const numValue = parseInt(value) || 0;
+    const clampedValue = Math.min(900, Math.max(0, Math.round(numValue / 10) * 10));
     const newScores = [...formData.scores];
-    newScores[index] = Math.min(30, Math.max(0, numValue));
+    newScores[index] = clampedValue;
     setFormData(prev => ({
       ...prev,
       scores: newScores
@@ -35,9 +36,9 @@ export default function SimpleForm() {
   const calculateARMRating = (scores: number[]) => {
     const total = scores.reduce((sum, score) => sum + score, 0);
     const baseRating = 10.0;
-    const expectedTotal = 75; // Expected total for average player
-    const performance = (total - expectedTotal) / 15;
-    return Math.max(5.0, Math.min(25.0, baseRating + performance));
+    const expectedTotal = 1800; // Expected total for average player (360 per game)
+    const performance = (total - expectedTotal) / 400;
+    return Math.max(7.0, Math.min(25.0, baseRating + performance));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,7 +139,8 @@ export default function SimpleForm() {
                 <Input
                   type="number"
                   min="0"
-                  max="30"
+                  max="900"
+                  step="10"
                   value={score}
                   onChange={(e) => handleScoreChange(index, e.target.value)}
                   className="retro-input text-center font-mono text-sm h-12 w-full focus:ring-2 focus:ring-cyan-400"
@@ -147,7 +149,7 @@ export default function SimpleForm() {
               </div>
             ))}
           </div>
-          <div className="text-xs text-gray-400 mt-2 text-center">ENTER SCORES 0-30 PER FRAME</div>
+          <div className="text-xs text-gray-400 mt-2 text-center">ENTER SCORES 0-900 IN INCREMENTS OF 10</div>
         </div>
 
         <div className="bg-slate-900/80 border border-cyan-400 p-3 rounded text-center">
@@ -155,7 +157,7 @@ export default function SimpleForm() {
           <div className="text-lg text-cyan-400 font-mono">
             {sessionTotal}
           </div>
-          <div className="text-xs text-gray-400 mt-1">OUT OF 150 POINTS</div>
+          <div className="text-xs text-gray-400 mt-1">OUT OF 4500 POINTS</div>
         </div>
 
         <div>

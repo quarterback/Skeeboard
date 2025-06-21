@@ -1,5 +1,5 @@
 import { Calculator } from "lucide-react";
-import ARMCalculator from "@/components/arm-calculator";
+import SimpleForm from "@/components/simple-form";
 import AccessibilityToggle from "@/components/accessibility-toggle";
 
 export default function Home() {
@@ -15,7 +15,7 @@ export default function Home() {
       </section>
 
       {/* ARM Calculator */}
-      <ARMCalculator />
+      <SimpleForm />
 
       {/* Info Section */}
       <section className="bg-slate-800/50 border-2 border-cyan-400 rounded-lg p-6 max-w-2xl mx-auto info-section">

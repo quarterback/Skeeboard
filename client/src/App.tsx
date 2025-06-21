@@ -7,7 +7,7 @@ import Home from "@/pages/home";
 
 function Router() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
       <AccessibilityToggle />
       <Home />
     </div>

@@ -21,8 +21,9 @@ export interface SessionData {
 }
 
 export function expectedScoreForRating(armRating: number): number {
-  // Maps an ARM rating (7.0–25.0) to an expected 5-game session score (150–700)
-  return ((armRating - 7.0) / 18.0) * 550 + 150;
+  // Maps an ARM rating (7.0–25.0) to an expected 5-game session score (1500–4250)
+  // These bounds correspond to beginner and elite-level total scores across 5 games
+  return ((armRating - 7.0) / 18.0) * 2750 + 1500;  // 2750-point range
 }
 
 export function confidenceScale(sessionCount: number): number {
@@ -37,14 +38,13 @@ export function calculateARMUpdate(currentRating: number, sessionScore: number, 
   // Includes expected score benchmarking, bidirectional updates,
   // and volatility scaling based on session count
   const expected = expectedScoreForRating(currentRating);
-  const performanceDelta = (sessionScore - expected) / 100;
-
-  // Scale gain/loss by session-based confidence
+  const delta = sessionScore - expected;
   const volatility = confidenceScale(sessionCount);
-  const ratingChange = performanceDelta * volatility;
 
-  // Apply and clamp new rating
+  // Scaled rating change based on performance delta
+  const ratingChange = (delta / 100) * volatility;
   const newRating = currentRating + ratingChange;
+
   return Math.round(Math.min(Math.max(newRating, 7.0), 25.0) * 10) / 10;
 }
 

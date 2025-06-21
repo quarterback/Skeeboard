@@ -21,7 +21,7 @@ export default function Home() {
         <Calculator className="text-cyan-400 text-3xl mb-4 mx-auto" aria-hidden="true" />
         <h3 className="text-cyan-400 mb-3 neon-text">HOW ARM RATING WORKS</h3>
         <p className="text-xs text-gray-300 mb-4 leading-relaxed">
-          ARM ratings range from 7.0 to 25.0. Enter your current rating (or start at 7.0), total sessions played, and your 5 game scores. Rating changes are larger for new players and stabilize as you play more sessions. Ratings under 5 sessions show as "provisional" (e.g., 12.3p).
+          ARM ratings range from 7.0 to 25.0. Enter your current rating (or start at 7.0), total sessions played, and your 5 game scores (0-900 each, up to 4500 total). Rating changes are larger for new players and stabilize as you play more sessions. Ratings under 5 sessions show as "provisional" (e.g., 12.3p).
         </p>
         <div className="sr-only">
           This calculator uses the ARM (Alley Roller Metric) system to rate skeeball performance. Input your five individual game scores and current rating to calculate your new ARM rating.

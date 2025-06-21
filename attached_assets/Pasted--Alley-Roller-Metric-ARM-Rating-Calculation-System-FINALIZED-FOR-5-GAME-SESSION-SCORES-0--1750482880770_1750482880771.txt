@@ -1,0 +1,73 @@
+# 🎳 Alley Roller Metric (ARM) — Rating Calculation System
+# FINALIZED FOR 5-GAME SESSION SCORES (0–4500 RANGE)
+
+# OVERVIEW:
+# Players log 5-game sessions. Each game is scored from 0–900.
+# A session total ranges from 0 (worst) to 4500 (perfect).
+# ARM rating ranges from 7.0 to 25.0 with decimal precision.
+# Rating should go up if a player outperforms their expected session score,
+# and go down if they underperform — just like UTR.
+# Volatility (rating sensitivity) is scaled by the number of sessions played.
+
+# ------------------------
+# FUNCTION DEFINITIONS
+# ------------------------
+
+def expected_score_for_rating(arm_rating):
+    """
+    Maps an ARM rating (7.0–25.0) to an expected 5-game session score (1500–4250).
+    These bounds correspond to beginner and elite-level total scores across 5 games.
+    """
+    return ((arm_rating - 7.0) / 18.0) * 2750 + 1500  # 2750-point range
+
+def confidence_scale(session_count):
+    """
+    Volatility decreases as session count increases.
+    More experienced players change rating less.
+    Returns a float between 1.0 (low confidence) and 0.1 (high confidence).
+    """
+    return max(0.1, 1.0 / (1 + 0.1 * session_count))
+
+def calculate_arm_rating(current_rating, session_score_total, session_count):
+    """
+    Calculates new ARM rating based on total score from a 5-game session.
+    Applies volatility scaling based on number of sessions played.
+    Clamps output between 7.0 and 25.0.
+    """
+    expected = expected_score_for_rating(current_rating)
+    delta = session_score_total - expected
+    volatility = confidence_scale(session_count)
+
+    # Scaled rating change based on performance delta
+    rating_change = (delta / 100) * volatility
+    new_rating = current_rating + rating_change
+
+    return round(min(max(new_rating, 7.0), 25.0), 1)
+
+# ------------------------
+# TEST CASES
+# ------------------------
+
+# Rookie scoring 1000 total across 5 games — terrible performance
+print(calculate_arm_rating(7.1, 1000, 2))     # Should stay ~7.0
+
+# Casual scoring 2500 (avg 500/game)
+print(calculate_arm_rating(7.0, 2500, 2))     # Expect modest increase (~7.3–7.6)
+
+# Advanced player scoring poorly
+print(calculate_arm_rating(16.0, 2200, 10))   # Expect drop
+
+# Pro-level performance
+print(calculate_arm_rating(24.0, 4300, 20))   # Expect cap at 25.0
+
+# Steady progress for mid-tier player
+print(calculate_arm_rating(14.0, 3100, 5))    # Small bump up
+
+# ------------------------
+# NOTES
+# ------------------------
+
+# - Ratings adjust slowly as session_count increases
+# - Total score input should always be for a 5-game session (0–4500)
+# - You may flag ratings as provisional if session_count < 5
+# - Rating deltas are scaled to keep the system resistant to cherry-picking

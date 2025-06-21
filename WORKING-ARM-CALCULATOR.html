@@ -67,7 +67,7 @@
             font-size: 0.9rem;
         }
         
-        input, textarea, button {
+        input, button {
             width: 100%;
             padding: 15px;
             background: #0f0f0f;
@@ -79,7 +79,7 @@
             transition: all 0.3s ease;
         }
         
-        input:focus, textarea:focus {
+        input:focus {
             border-color: #00ff00;
             outline: none;
             box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
@@ -346,14 +346,9 @@
         }
         
         function calculateARMRating(currentRating, sessionTotal, sessionCount = 0) {
-            // ARM rating calculation algorithm
-            const expectedScore = currentRating * 180; // Rough baseline
+            const expectedScore = currentRating * 180;
             const performance = (sessionTotal - expectedScore) / 300;
-            
-            // K-factor based on experience
             const kFactor = sessionCount < 5 ? 0.8 : 0.4;
-            
-            // Calculate new rating
             const newRating = Math.max(7.0, Math.min(25.0, currentRating + (performance * kFactor)));
             const delta = newRating - currentRating;
             const isProvisional = sessionCount < 5;
@@ -362,12 +357,12 @@
         }
         
         function getRatingColor(rating) {
-            if (rating >= 20) return '#ff00ff';  // Elite - Magenta
-            if (rating >= 18) return '#00ffff';  // Expert - Cyan
-            if (rating >= 15) return '#ffff00';  // Advanced - Yellow
-            if (rating >= 12) return '#00ff00';  // Intermediate - Green
-            if (rating >= 10) return '#ff8800';  // Developing - Orange
-            return '#ff6666';                    // Beginner - Red
+            if (rating >= 20) return '#ff00ff';
+            if (rating >= 18) return '#00ffff';
+            if (rating >= 15) return '#ffff00';
+            if (rating >= 12) return '#00ff00';
+            if (rating >= 10) return '#ff8800';
+            return '#ff6666';
         }
         
         function getRatingTitle(rating) {
@@ -397,15 +392,12 @@
                 return;
             }
             
-            // Save player name
             localStorage.setItem('armPlayerName', playerName);
             
-            // Calculate new rating
             const calculation = calculateARMRating(currentRating, sessionTotal, sessionCount);
             const ratingColor = getRatingColor(calculation.newRating);
             const ratingTitle = getRatingTitle(calculation.newRating);
             
-            // Display results
             const ratingDisplay = calculation.isProvisional ? 
                 `${calculation.newRating.toFixed(1)}p` : 
                 calculation.newRating.toFixed(1);
@@ -437,6 +429,10 @@
                     <div class="stat-label">RATING CHANGE</div>
                     <div class="stat-value" style="color: ${calculation.delta > 0 ? '#00ff00' : '#ff6666'};">${deltaStr}</div>
                 </div>
+                <div class="stat-item">
+                    <div class="stat-label">SESSIONS PLAYED</div>
+                    <div class="stat-value">${sessionCount + 1}</div>
+                </div>
                 ${calculation.isProvisional ? 
                     `<div class="stat-item">
                         <div class="stat-label">STATUS</div>
@@ -446,26 +442,6 @@
             
             document.getElementById('result').classList.remove('hidden');
             document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
-            
-            // Play success sound
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-                oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
-                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.3);
-            } catch (e) {
-                // Audio not supported
-            }
         });
     </script>
 </body>

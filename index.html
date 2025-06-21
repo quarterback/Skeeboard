@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARM Rating Calculator - Alley Roller Mastery</title>
+    <meta name="description" content="Calculate your ARM (Alley Roller Mastery) rating and compete with skeeball players worldwide!">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #00ff00;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px #00ff00;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #00ff00; }
+            to { text-shadow: 0 0 30px #00ff00, 0 0 40px #00aa00; }
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #00cccc;
+            margin-bottom: 2rem;
+            font-size: 1.2rem;
+        }
+        
+        .card {
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid #00ff00;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            color: #00cccc;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        
+        input, button {
+            width: 100%;
+            padding: 15px;
+            background: #0f0f0f;
+            border: 2px solid #333;
+            color: #00ff00;
+            font-family: inherit;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: #00ff00;
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .score-input {
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .score-label {
+            text-align: center;
+            color: #00cccc;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #003300, #006600);
+            border-color: #00ff00;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+        
+        button:hover {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            border: 2px solid #00ff00;
+            border-radius: 12px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .rating-display {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 0 0 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 255, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+        
+        .stat-label {
+            color: #00cccc;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .total-display {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00cccc;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .total-value {
+            font-size: 2rem;
+            color: #00cccc;
+            font-weight: bold;
+        }
+        
+        .info-section {
+            background: rgba(0, 50, 100, 0.3);
+            border: 2px solid #0066cc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+        }
+        
+        .info-section h3 {
+            color: #00ccff;
+            margin-bottom: 1rem;
+        }
+        
+        .info-section p {
+            color: #cccccc;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .scores-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .rating-display {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎳 ARM RATING CALCULATOR 🎳</h1>
+        <p class="subtitle">ALLEY ROLLER MASTERY SYSTEM</p>
+        
+        <div class="card">
+            <h3 style="color: #00cccc; margin-bottom: 1.5rem;">CALCULATE YOUR ARM RATING</h3>
+            
+            <form id="armForm">
+                <div class="form-group">
+                    <label for="playerName">Player Name:</label>
+                    <input type="text" id="playerName" required placeholder="Enter your name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="currentRating">Current ARM Rating (Optional):</label>
+                    <input type="number" id="currentRating" step="0.1" min="7.0" max="25.0" placeholder="10.0">
+                    <small style="color: #888; font-size: 0.8rem;">Leave blank if this is your first rating</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>5-Game Session Scores (0-900 each):</label>
+                    <div class="scores-grid">
+                        <div>
+                            <div class="score-label">Game 1</div>
+                            <input type="number" class="score-input" data-game="0" min="0" max="900" step="10" placeholder="0">
+                        </div>
+                        <div>
+                            <div class="score-label">Game 2</div>
+                            <input type="number" class="score-input" data-game="1" min="0" max="900" step="10" placeholder="0">
+                        </div>
+                        <div>
+                            <div class="score-label">Game 3</div>
+                            <input type="number" class="score-input" data-game="2" min="0" max="900" step="10" placeholder="0">
+                        </div>
+                        <div>
+                            <div class="score-label">Game 4</div>
+                            <input type="number" class="score-input" data-game="3" min="0" max="900" step="10" placeholder="0">
+                        </div>
+                        <div>
+                            <div class="score-label">Game 5</div>
+                            <input type="number" class="score-input" data-game="4" min="0" max="900" step="10" placeholder="0">
+                        </div>
+                    </div>
+                    <small style="color: #888; font-size: 0.8rem;">Scores must be in increments of 10</small>
+                </div>
+                
+                <div class="total-display">
+                    <div style="color: #00cccc; font-size: 0.9rem; margin-bottom: 0.5rem;">SESSION TOTAL</div>
+                    <div class="total-value" id="sessionTotal">0</div>
+                    <div style="color: #888; font-size: 0.8rem; margin-top: 0.5rem;">out of 4500 points</div>
+                </div>
+                
+                <button type="submit" id="calculateBtn">CALCULATE ARM RATING</button>
+            </form>
+        </div>
+        
+        <div id="result" class="result hidden">
+            <h3 style="color: #00ff00; text-align: center; margin-bottom: 1rem;">ARM RATING CALCULATED!</h3>
+            <div class="rating-display" id="ratingDisplay"></div>
+            <div class="stats" id="statsGrid"></div>
+        </div>
+        
+        <div class="info-section">
+            <h3>HOW ARM RATING WORKS</h3>
+            <p>
+                The Alley Roller Mastery (ARM) rating system evaluates skeeball performance based on 5-game sessions. 
+                Ratings range from 7.0 (beginner) to 25.0+ (elite).
+            </p>
+            <p>
+                Your rating adjusts based on session performance compared to expectations for your current level. 
+                New players see larger rating changes as the system learns their skill level.
+            </p>
+            <p>
+                Each game is scored 0-900 points, making the maximum session total 4500 points. 
+                Consistent performance around 1800-2000 total typically maintains a 10-12 ARM rating.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let scores = [0, 0, 0, 0, 0];
+        
+        // Load saved player name
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedName = localStorage.getItem('armPlayerName');
+            if (savedName) {
+                document.getElementById('playerName').value = savedName;
+            }
+        });
+        
+        // Update session total as scores change
+        document.querySelectorAll('.score-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const gameIndex = parseInt(this.dataset.game);
+                let value = parseInt(this.value) || 0;
+                
+                // Round to nearest 10 and clamp to valid range
+                value = Math.min(900, Math.max(0, Math.round(value / 10) * 10));
+                this.value = value;
+                scores[gameIndex] = value;
+                
+                updateSessionTotal();
+            });
+        });
+        
+        function updateSessionTotal() {
+            const total = scores.reduce((sum, score) => sum + score, 0);
+            document.getElementById('sessionTotal').textContent = total;
+        }
+        
+        function calculateARMRating(currentRating, sessionTotal, sessionCount = 0) {
+            const expectedScore = currentRating * 180;
+            const performance = (sessionTotal - expectedScore) / 300;
+            const kFactor = sessionCount < 5 ? 0.8 : 0.4;
+            const newRating = Math.max(7.0, Math.min(25.0, currentRating + (performance * kFactor)));
+            const delta = newRating - currentRating;
+            const isProvisional = sessionCount < 5;
+            
+            return { newRating, delta, isProvisional };
+        }
+        
+        function getRatingColor(rating) {
+            if (rating >= 20) return '#ff00ff';
+            if (rating >= 18) return '#00ffff';
+            if (rating >= 15) return '#ffff00';
+            if (rating >= 12) return '#00ff00';
+            if (rating >= 10) return '#ff8800';
+            return '#ff6666';
+        }
+        
+        function getRatingTitle(rating) {
+            if (rating >= 20) return 'ELITE PLAYER';
+            if (rating >= 18) return 'EXPERT PLAYER';
+            if (rating >= 15) return 'ADVANCED PLAYER';
+            if (rating >= 12) return 'INTERMEDIATE PLAYER';
+            if (rating >= 10) return 'DEVELOPING PLAYER';
+            return 'BEGINNER PLAYER';
+        }
+        
+        document.getElementById('armForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const playerName = document.getElementById('playerName').value;
+            const currentRating = parseFloat(document.getElementById('currentRating').value) || 10.0;
+            const sessionTotal = scores.reduce((sum, score) => sum + score, 0);
+            
+            if (!playerName) {
+                alert('Please enter your player name');
+                return;
+            }
+            
+            if (sessionTotal === 0) {
+                alert('Please enter your game scores');
+                return;
+            }
+            
+            localStorage.setItem('armPlayerName', playerName);
+            
+            const calculation = calculateARMRating(currentRating, sessionTotal, 0);
+            const ratingColor = getRatingColor(calculation.newRating);
+            const ratingTitle = getRatingTitle(calculation.newRating);
+            
+            const ratingDisplay = calculation.isProvisional ? 
+                `${calculation.newRating.toFixed(1)}p` : 
+                calculation.newRating.toFixed(1);
+            
+            document.getElementById('ratingDisplay').innerHTML = ratingDisplay;
+            document.getElementById('ratingDisplay').style.color = ratingColor;
+            
+            const deltaStr = calculation.delta > 0 ? `+${calculation.delta.toFixed(1)}` : calculation.delta.toFixed(1);
+            const avgPerGame = (sessionTotal / 5).toFixed(1);
+            
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-label">PLAYER</div>
+                    <div class="stat-value">${playerName}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">SKILL LEVEL</div>
+                    <div class="stat-value" style="color: ${ratingColor};">${ratingTitle}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">SESSION TOTAL</div>
+                    <div class="stat-value">${sessionTotal}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">AVERAGE PER GAME</div>
+                    <div class="stat-value">${avgPerGame}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">RATING CHANGE</div>
+                    <div class="stat-value" style="color: ${calculation.delta > 0 ? '#00ff00' : '#ff6666'};">${deltaStr}</div>
+                </div>
+                ${calculation.isProvisional ? 
+                    `<div class="stat-item">
+                        <div class="stat-label">STATUS</div>
+                        <div class="stat-value" style="color: #ffff00;">PROVISIONAL</div>
+                    </div>` : ''}
+            `;
+            
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

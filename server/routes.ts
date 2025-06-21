@@ -1,67 +1,43 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertSessionSchema } from "@shared/schema";
 import { z } from "zod";
 import { expectedScoreForRating, calculateARMUpdate, getKFactor } from "../client/src/lib/arm-rating";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
-  // Submit a new session
-  app.post("/api/sessions", async (req, res) => {
+  // Calculate ARM rating (no storage)
+  app.post("/api/calculate-arm", async (req, res) => {
     try {
-      const result = insertSessionSchema.safeParse(req.body);
+      const calculatorSchema = z.object({
+        currentARMRating: z.number().min(7.0).max(25.0).optional(),
+        scores: z.array(z.number().min(0).max(900)).length(5),
+      });
+
+      const result = calculatorSchema.safeParse(req.body);
       if (!result.success) {
-        return res.status(400).json({ error: "Invalid session data", details: result.error.issues });
+        return res.status(400).json({ error: "Invalid data", details: result.error.issues });
       }
 
-      const { scores, currentARMRating, ...sessionData } = result.data;
-      const sessionTotal = scores.reduce((sum, score) => sum + score, 0);
+      const { scores, currentARMRating } = result.data;
+      const sessionTotal = scores.reduce((sum: number, score: number) => sum + score, 0);
 
       // Use provided ARM rating or default
-      let armRatingBefore = currentARMRating || 10.0;
+      const armRatingBefore = currentARMRating || 10.0;
       
       // Calculate new ARM rating using your exact formula
       const armRatingAfter = calculateARMUpdate(armRatingBefore, sessionTotal, 0.15);
       const armDelta = armRatingAfter - armRatingBefore;
 
-      // Get or create player
-      let player = await storage.getPlayer(sessionData.playerName);
-      if (!player) {
-        player = await storage.createPlayer({
-          name: sessionData.playerName,
-          currentRating: armRatingAfter,
-          totalSessions: 1,
-          isProvisional: false,
-        });
-      } else {
-        // Update player with new rating
-        await storage.updatePlayer(player.name, {
-          currentRating: armRatingAfter,
-          totalSessions: player.totalSessions + 1,
-        });
-      }
-
-      // Create session record
-      const session = await storage.createSession({
-        ...sessionData,
-        score1: scores[0],
-        score2: scores[1],
-        score3: scores[2],
-        score4: scores[3],
-        score5: scores[4],
-      });
-
       res.json({ 
-        session,
         armRating: armRatingAfter,
         armDelta,
-        isProvisional: player.isProvisional && player.totalSessions < 3
+        sessionTotal
       });
     } catch (error) {
-      console.error("Error creating session:", error);
-      res.status(500).json({ error: "Failed to create session" });
+      console.error("Error calculating ARM rating:", error);
+      res.status(500).json({ error: "Failed to calculate ARM rating" });
     }
   });
 

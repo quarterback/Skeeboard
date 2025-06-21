@@ -14,9 +14,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { calculateSessionTotal, formatRating, getRatingColor, playRetroSound } from "@/lib/utils";
 
 const sessionSchema = z.object({
-  playerName: z.string().min(1, "Player name is required").max(100),
-  venueName: z.string().min(1, "Venue name is required").max(200),
-  cityName: z.string().min(1, "City is required").max(100),
   currentARMRating: z.number().min(7.0).max(25.0).optional(),
   scores: z.array(
     z.number()
@@ -24,7 +21,6 @@ const sessionSchema = z.object({
       .max(900, "Score cannot exceed 900")
       .refine((val) => val % 10 === 0, "Score must be in increments of 10")
   ).length(5),
-  notes: z.string().max(500).optional(),
 });
 
 type SessionForm = z.infer<typeof sessionSchema>;
@@ -38,12 +34,8 @@ export default function ScoreSubmissionForm() {
   const form = useForm<SessionForm>({
     resolver: zodResolver(sessionSchema),
     defaultValues: {
-      playerName: "",
-      venueName: "",
-      cityName: "",
       currentARMRating: undefined,
       scores: [0, 0, 0, 0, 0],
-      notes: "",
     },
   });
 
@@ -51,17 +43,18 @@ export default function ScoreSubmissionForm() {
 
   const createSessionMutation = useMutation({
     mutationFn: async (data: SessionForm) => {
-      const response = await apiRequest("POST", "/api/sessions", data);
+      const response = await apiRequest("POST", "/api/calculate-arm", data);
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const { armRating, armDelta } = data;
+      const deltaStr = armDelta > 0 ? `+${armDelta.toFixed(1)}` : armDelta.toFixed(1);
       toast({
-        title: "🎯 SESSION SUBMITTED!",
-        description: "Your scores have been recorded. Keep rolling!",
+        title: "ARM RATING CALCULATED",
+        description: `New rating: ${armRating.toFixed(1)} (${deltaStr})`,
       });
       playRetroSound("success");
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["/api/leaderboard"] });
     },
     onError: () => {
       toast({

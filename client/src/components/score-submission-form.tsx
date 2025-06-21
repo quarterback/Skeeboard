@@ -32,7 +32,7 @@ type SessionForm = z.infer<typeof sessionSchema>;
 export default function ScoreSubmissionForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedState, setSelectedState] = useState<string>("");
+
 
 
   const form = useForm<SessionForm>({
@@ -40,15 +40,14 @@ export default function ScoreSubmissionForm() {
     defaultValues: {
       playerName: "",
       venueName: "",
+      cityName: "",
+      currentARMRating: undefined,
       scores: [0, 0, 0, 0, 0],
       notes: "",
     },
   });
 
-  const { data: venues = [] } = useQuery({
-    queryKey: ["/api/venues", selectedState],
-    enabled: !!selectedState && selectedState !== "OTHER",
-  });
+
 
   const createSessionMutation = useMutation({
     mutationFn: async (data: SessionForm) => {
@@ -62,7 +61,6 @@ export default function ScoreSubmissionForm() {
       });
       playRetroSound("success");
       form.reset();
-      setPhotoFile(null);
       queryClient.invalidateQueries({ queryKey: ["/api/leaderboard"] });
     },
     onError: () => {
@@ -85,13 +83,7 @@ export default function ScoreSubmissionForm() {
     createSessionMutation.mutate(data);
   };
 
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setPhotoFile(file);
-      playRetroSound("submit");
-    }
-  };
+
 
   return (
     <section className="bg-slate-800/50 border-2 border-cyan-400 rounded-lg p-6 max-w-md mx-auto">
@@ -176,8 +168,16 @@ export default function ScoreSubmissionForm() {
                         return;
                       }
                       const numValue = parseFloat(value);
-                      if (!isNaN(numValue) && numValue >= 7.0 && numValue <= 25.0) {
+                      if (!isNaN(numValue)) {
                         field.onChange(numValue);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      let value = parseFloat(e.target.value) || undefined;
+                      if (value !== undefined) {
+                        // Clamp between 7.0 and 25.0
+                        value = Math.max(7.0, Math.min(25.0, value));
+                        field.onChange(value);
                       }
                     }}
                   />

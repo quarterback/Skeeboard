@@ -16,6 +16,7 @@ export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
   playerName: varchar("player_name", { length: 100 }).notNull(),
   venueName: varchar("venue_name", { length: 200 }).notNull(),
+  cityName: varchar("city_name", { length: 100 }).notNull(),
   score1: integer("score_1").notNull(),
   score2: integer("score_2").notNull(),
   score3: integer("score_3").notNull(),
@@ -25,7 +26,6 @@ export const sessions = pgTable("sessions", {
   armRatingBefore: real("arm_rating_before"),
   armRatingAfter: real("arm_rating_after"),
   armDelta: real("arm_delta"),
-  photoVerified: boolean("photo_verified").default(false).notNull(),
   notes: text("notes"),
   submittedAt: timestamp("submitted_at").defaultNow().notNull(),
 });

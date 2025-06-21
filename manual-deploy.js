@@ -40,37 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 fs.writeFileSync('dist/main.js', mainJs);
 
-// Build the server
-try {
-  console.log('Building server...');
-  execSync('npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist', { stdio: 'inherit' });
-} catch (error) {
-  console.log('Server build failed, creating minimal server...');
-  
-  const minimalServer = `
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Serve static files
-app.use(express.static(__dirname));
-
-// Catch-all handler
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(\`Server running on port \${PORT}\`);
-});
-`;
-  
-  fs.writeFileSync('dist/index.js', minimalServer);
-}
+// Copy the production server
+console.log('Creating production server...');
+const productionServerContent = fs.readFileSync('production-server.js', 'utf-8');
+fs.writeFileSync('dist/index.js', productionServerContent);
 
 console.log('\nDeployment files created:');
 const files = fs.readdirSync('dist');

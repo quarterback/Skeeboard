@@ -1,97 +1,63 @@
-# Alley Roller Mastery Calculator
+# ARM Rating Calculator
 
-A retro pixel art alleyroller rating calculator that enables players to benchmark their ARM (Alley Roller Mastery) rating against global competitors.
+A retro-styled skeeball rating calculator that computes ARM (Alley Roller Mastery) ratings based on 5-game sessions.
 
 ## Features
 
-- Submit bowling session scores (5 frames)
-- Calculate ARM ratings with real-time feedback
-- Player profiles with rating history
-- Global and venue-specific leaderboards
-- Retro pixel art design with accessibility features
+- Calculate ARM ratings from 7.0 (beginner) to 25.0+ (elite)
+- Retro pixel art design with animated effects
+- Real-time session total calculation
+- Player name persistence via localStorage
+- Responsive design for mobile and desktop
+- No database required - runs entirely in the browser
 
-## Technologies
+## Live Demo
 
-- **Frontend**: React, TypeScript, Tailwind CSS, Radix UI
-- **Backend**: Express.js, Node.js
-- **Database**: PostgreSQL with Drizzle ORM
-- **Deployment**: Vercel/Netlify ready
+Deploy this to any static hosting service for instant access.
 
-## Local Development
+## Deployment Options
 
-1. Clone the repository:
-```bash
-git clone <your-repo-url>
-cd alley-roller-calculator
-```
+### GitHub Pages
+1. Upload this repository to GitHub
+2. Go to Settings → Pages
+3. Select "Deploy from main branch"
+4. Your app will be live at `username.github.io/repository-name`
 
-2. Install dependencies:
-```bash
-npm install
-```
+### Vercel
+1. Connect your GitHub repository to Vercel
+2. Deploy automatically with zero configuration
+3. Get a custom domain like `arm-calculator.vercel.app`
 
-3. Set up environment variables:
-```bash
-cp .env.example .env
-# Add your DATABASE_URL and other environment variables
-```
+### Netlify
+1. Drag and drop the files to Netlify
+2. Or connect your GitHub repository
+3. Instant deployment with custom domain options
 
-4. Set up the database:
-```bash
-npm run db:push
-```
+## How ARM Rating Works
 
-5. Start the development server:
-```bash
-npm run dev
-```
+The ARM rating system evaluates skeeball performance based on 5-game sessions:
 
-## Deployment
+- **Scoring**: Each game scored 0-900 points (increments of 10)
+- **Session Total**: Maximum 4500 points across 5 games
+- **Rating Range**: 7.0 (beginner) to 25.0+ (elite)
+- **Calculation**: Performance compared to expected score for current rating
 
-### Quick Deploy (Standalone)
-For a simple deployment without database:
-```bash
-node simple-deploy.js
-```
-This creates a self-contained app in `dist/` that works anywhere.
+### Rating Levels
+- **7.0-9.9**: Beginner Player
+- **10.0-11.9**: Developing Player  
+- **12.0-14.9**: Intermediate Player
+- **15.0-17.9**: Advanced Player
+- **18.0-19.9**: Expert Player
+- **20.0+**: Elite Player
 
-### Full Stack Deploy
-1. Build the project:
-```bash
-npm run build
-```
+## Technical Details
 
-2. Deploy to your preferred platform:
-- **Vercel**: Connect your GitHub repo
-- **Netlify**: Connect your GitHub repo  
-- **Railway**: Connect your GitHub repo
-- **Render**: Connect your GitHub repo
-
-## Environment Variables
-
-```
-DATABASE_URL=postgresql://...
-NODE_ENV=production
-PORT=5000
-```
-
-## Project Structure
-
-```
-├── client/           # React frontend
-├── server/           # Express backend  
-├── shared/           # Shared types and schemas
-├── dist/             # Build output
-└── scripts/          # Deployment scripts
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+- Pure HTML, CSS, and JavaScript
+- No build process required
+- Works offline after initial load
+- Progressive Web App capabilities
+- Cross-browser compatible
 
 ## License
 
-MIT License
+MIT License - Feel free to use and modify

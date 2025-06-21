@@ -1,0 +1,20 @@
+{
+  "name": "alley-roller-calculator",
+  "version": "1.0.0",
+  "description": "Retro bowling ARM rating calculator",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve .",
+    "build": "echo 'No build needed - static HTML app'"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "bowling",
+    "calculator",
+    "retro",
+    "games"
+  ],
+  "author": "ARM Calculator",
+  "license": "MIT"
+}

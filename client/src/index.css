@@ -171,3 +171,203 @@
   25% { transform: translateX(-2px); }
   75% { transform: translateX(2px); }
 }
+
+/* Accessibility Mode - High Contrast for Color-Blind Users */
+.accessibility-mode {
+  /* Override all colors with high-contrast alternatives */
+  --background-primary: #000000;
+  --background-secondary: #1a1a1a;
+  --background-tertiary: #333333;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #999999;
+  
+  --accent-primary: #ffff00; /* Bright yellow */
+  --accent-secondary: #ff0080; /* Bright magenta */
+  --accent-tertiary: #00ff00; /* Bright green */
+  
+  --border-primary: #ffffff;
+  --border-secondary: #ffff00;
+  
+  --success: #00ff00;
+  --warning: #ffff00;
+  --error: #ff0000;
+}
+
+.accessibility-mode body {
+  background: var(--background-primary);
+  color: var(--text-primary);
+}
+
+.accessibility-mode .bg-slate-900,
+.accessibility-mode .bg-slate-800\/50,
+.accessibility-mode .bg-slate-800\/30,
+.accessibility-mode .bg-slate-700\/50 {
+  background: var(--background-secondary) !important;
+}
+
+.accessibility-mode .text-cyan-400,
+.accessibility-mode .neon-text {
+  color: var(--accent-primary) !important;
+  text-shadow: 0 0 5px var(--accent-primary), 0 0 10px var(--accent-primary) !important;
+}
+
+.accessibility-mode .text-orange-500 {
+  color: var(--accent-secondary) !important;
+  text-shadow: 0 0 5px var(--accent-secondary), 0 0 10px var(--accent-secondary) !important;
+}
+
+.accessibility-mode .text-green-400 {
+  color: var(--accent-tertiary) !important;
+  text-shadow: 0 0 5px var(--accent-tertiary), 0 0 10px var(--accent-tertiary) !important;
+}
+
+.accessibility-mode .text-gray-300,
+.accessibility-mode .text-gray-400 {
+  color: var(--text-secondary) !important;
+}
+
+.accessibility-mode .border-cyan-400 {
+  border-color: var(--accent-primary) !important;
+}
+
+.accessibility-mode .border-orange-500 {
+  border-color: var(--accent-secondary) !important;
+}
+
+.accessibility-mode .border-green-400 {
+  border-color: var(--accent-tertiary) !important;
+}
+
+.accessibility-mode .retro-input {
+  background: var(--background-tertiary) !important;
+  border: 2px solid var(--border-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.accessibility-mode .retro-input:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 10px var(--accent-primary) !important;
+}
+
+.accessibility-mode .retro-button {
+  background: var(--background-tertiary) !important;
+  border: 2px solid var(--border-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.accessibility-mode .retro-button:hover {
+  background: var(--accent-primary) !important;
+  color: var(--background-primary) !important;
+  box-shadow: 0 0 15px var(--accent-primary) !important;
+}
+
+.accessibility-mode .accessibility-toggle {
+  background: var(--background-secondary) !important;
+  border: 2px solid var(--accent-tertiary) !important;
+  color: var(--text-primary) !important;
+}
+
+.accessibility-mode .accessibility-toggle:hover {
+  background: var(--accent-tertiary) !important;
+  color: var(--background-primary) !important;
+}
+
+/* High contrast focus indicators */
+.accessibility-mode *:focus {
+  outline: 3px solid var(--accent-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Enhanced button contrast */
+.accessibility-mode button {
+  font-weight: bold !important;
+}
+
+/* Ensure all borders are visible */
+.accessibility-mode [class*="border"] {
+  border-width: 2px !important;
+}
+
+/* Toast notifications in accessibility mode */
+.accessibility-mode .toast {
+  background: var(--background-secondary) !important;
+  border: 2px solid var(--accent-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.accessibility-mode .toast[data-state="open"] {
+  box-shadow: 0 0 20px var(--accent-primary) !important;
+}
+
+/* Session total display */
+.accessibility-mode .session-total {
+  background: var(--background-tertiary) !important;
+  border: 2px solid var(--accent-secondary) !important;
+  color: var(--accent-secondary) !important;
+}
+
+/* Info section styling */
+.accessibility-mode .info-section {
+  background: var(--background-secondary) !important;
+  border: 2px solid var(--accent-primary) !important;
+}
+
+/* Enhanced text contrast */
+.accessibility-mode h1,
+.accessibility-mode h2,
+.accessibility-mode h3,
+.accessibility-mode h4 {
+  color: var(--text-primary) !important;
+  font-weight: bold !important;
+}
+
+/* Better spacing for readability */
+.accessibility-mode button,
+.accessibility-mode input,
+.accessibility-mode textarea {
+  padding: 12px !important;
+  margin: 4px 0 !important;
+}
+
+/* Pattern-based differentiation for severe color blindness */
+.accessibility-mode .pattern-primary {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    var(--accent-primary) 2px,
+    var(--accent-primary) 4px
+  ) !important;
+}
+
+.accessibility-mode .pattern-secondary {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 2px,
+    var(--accent-secondary) 2px,
+    var(--accent-secondary) 4px
+  ) !important;
+}
+
+/* Keyboard navigation indicators */
+.accessibility-mode *:focus-visible {
+  outline: 4px solid var(--accent-primary) !important;
+  outline-offset: 3px !important;
+  background: var(--background-tertiary) !important;
+}
+
+/* Screen reader friendly elements */
+.accessibility-mode .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

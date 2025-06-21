@@ -75,8 +75,12 @@ export default function ARMCalculator() {
   const sessionTotal = form.watch("scores").reduce((sum, score) => sum + score, 0);
 
   return (
-    <section className="bg-slate-800/50 border-2 border-cyan-400 rounded-lg p-6 max-w-md mx-auto">
-      <h3 className="text-center text-cyan-400 mb-6 neon-text">ARM CALCULATOR</h3>
+    <section 
+      className="bg-slate-800/50 border-2 border-cyan-400 rounded-lg p-6 max-w-md mx-auto"
+      role="main"
+      aria-labelledby="calculator-title"
+    >
+      <h3 id="calculator-title" className="text-center text-cyan-400 mb-6 neon-text">ARM CALCULATOR</h3>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -107,9 +111,9 @@ export default function ARMCalculator() {
           />
 
           {/* Score Inputs */}
-          <div className="space-y-4">
-            <FormLabel className="text-cyan-400 text-xs block">5-GAME SCORES (0-900)</FormLabel>
-            <div className="grid grid-cols-1 gap-3">
+          <fieldset className="space-y-4">
+            <legend className="text-cyan-400 text-xs block">5-GAME SCORES (0-900)</legend>
+            <div className="grid grid-cols-1 gap-3" role="group" aria-label="Game scores">
               {[0, 1, 2, 3, 4].map((index) => (
                 <FormField
                   key={index}
@@ -122,25 +126,32 @@ export default function ARMCalculator() {
                           type="number"
                           min="0"
                           max="900"
+                          step="10"
                           placeholder={`Game ${index + 1} score`}
                           className="retro-input text-center"
+                          aria-label={`Game ${index + 1} score`}
+                          aria-describedby={`game-${index + 1}-help`}
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                           onBlur={(e) => handleScoreBlur(index, e.target.value)}
                         />
                       </FormControl>
+                      <div id={`game-${index + 1}-help`} className="sr-only">
+                        Enter score for game {index + 1}, between 0 and 900 points
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               ))}
             </div>
-          </div>
+          </fieldset>
 
           {/* Session Total Display */}
-          <div className="bg-slate-700/50 border border-orange-500 rounded p-4 text-center">
+          <div className="bg-slate-700/50 border border-orange-500 rounded p-4 text-center session-total">
             <div className="text-xs text-gray-300 mb-1">SESSION TOTAL</div>
             <div className="text-2xl text-orange-500 neon-text">{sessionTotal}</div>
+            <span className="sr-only">Current session total is {sessionTotal} points</span>
           </div>
 
           {/* Submit Button */}

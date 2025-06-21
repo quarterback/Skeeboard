@@ -1,5 +1,6 @@
 import { Calculator } from "lucide-react";
 import ARMCalculator from "@/components/arm-calculator";
+import AccessibilityToggle from "@/components/accessibility-toggle";
 
 export default function Home() {
   return (
@@ -27,6 +28,14 @@ export default function Home() {
           This calculator uses the ARM (Alley Roller Metric) system to rate skeeball performance. Input your five individual game scores and current rating to calculate your new ARM rating.
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="mt-8 pt-6 border-t border-slate-700 text-center">
+        <div className="flex justify-center items-center gap-4">
+          <span className="text-xs text-gray-400">Accessibility:</span>
+          <AccessibilityToggle />
+        </div>
+      </footer>
     </main>
   );
 }

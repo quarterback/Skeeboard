@@ -28,26 +28,18 @@ export default function AccessibilityToggle() {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50">
-      <Button
-        onClick={toggleAccessibilityMode}
-        variant="outline"
-        size="sm"
-        className="accessibility-toggle bg-slate-800/90 border-2 hover:bg-slate-700/90 text-white"
-        title={isAccessibilityMode ? "Disable high contrast mode" : "Enable high contrast mode"}
-      >
-        {isAccessibilityMode ? (
-          <>
-            <EyeOff className="w-4 h-4 mr-2" />
-            HIGH CONTRAST
-          </>
-        ) : (
-          <>
-            <Eye className="w-4 h-4 mr-2" />
-            ACCESSIBILITY
-          </>
-        )}
-      </Button>
-    </div>
+    <Button
+      onClick={toggleAccessibilityMode}
+      variant="outline"
+      size="sm"
+      className="accessibility-toggle bg-slate-800/90 border border-cyan-400 hover:bg-slate-700/90 text-cyan-400 text-xs px-2 py-1"
+      title={isAccessibilityMode ? "Disable high contrast mode" : "Enable high contrast mode"}
+    >
+      {isAccessibilityMode ? (
+        <EyeOff className="w-3 h-3" />
+      ) : (
+        <Eye className="w-3 h-3" />
+      )}
+    </Button>
   );
 }

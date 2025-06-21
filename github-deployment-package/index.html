@@ -429,6 +429,10 @@
                     <div class="stat-label">RATING CHANGE</div>
                     <div class="stat-value" style="color: ${calculation.delta > 0 ? '#00ff00' : '#ff6666'};">${deltaStr}</div>
                 </div>
+                <div class="stat-item">
+                    <div class="stat-label">SESSIONS PLAYED</div>
+                    <div class="stat-value">${sessionCount + 1}</div>
+                </div>
                 ${calculation.isProvisional ? 
                     `<div class="stat-item">
                         <div class="stat-label">STATUS</div>
@@ -438,6 +442,26 @@
             
             document.getElementById('result').classList.remove('hidden');
             document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+            
+            // Play success sound
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (e) {
+                // Audio not supported
+            }
         });
     </script>
 </body>

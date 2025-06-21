@@ -53,8 +53,8 @@ export const insertSessionSchema = createInsertSchema(sessions).omit({
   scores: z.array(
     z.number()
       .min(0, "Score must be at least 0")
-      .max(900, "Score cannot exceed 900")
-      .refine((val) => val % 10 === 0, "Score must be in increments of 10")
+      .max(30, "Score cannot exceed 30")
+      .int("Score must be a whole number")
   ).length(5),
 });
 

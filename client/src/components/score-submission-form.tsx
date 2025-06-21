@@ -14,13 +14,17 @@ import { apiRequest } from "@/lib/queryClient";
 import { calculateSessionTotal, formatRating, getRatingColor, playRetroSound } from "@/lib/utils";
 
 const sessionSchema = z.object({
+  playerName: z.string().min(1, "Player name is required"),
+  venueName: z.string().min(1, "Venue name is required"),
+  cityName: z.string().min(1, "City name is required"),
   currentARMRating: z.number().min(7.0).max(25.0).optional(),
   scores: z.array(
     z.number()
       .min(0, "Score must be at least 0")
-      .max(900, "Score cannot exceed 900")
-      .refine((val) => val % 10 === 0, "Score must be in increments of 10")
+      .max(30, "Score cannot exceed 30")
+      .int("Score must be a whole number")
   ).length(5),
+  notes: z.string().optional(),
 });
 
 type SessionForm = z.infer<typeof sessionSchema>;
@@ -34,8 +38,12 @@ export default function ScoreSubmissionForm() {
   const form = useForm<SessionForm>({
     resolver: zodResolver(sessionSchema),
     defaultValues: {
+      playerName: "",
+      venueName: "",
+      cityName: "",
       currentARMRating: undefined,
       scores: [0, 0, 0, 0, 0],
+      notes: "",
     },
   });
 
